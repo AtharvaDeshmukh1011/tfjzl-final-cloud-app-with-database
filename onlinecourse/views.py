@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from .models import Choice, Course, Enrollment, Question, Submission
+from .models import Choice, Course, Learner, Question, Submission
 
 
 def course_details(request, course_id):
@@ -14,7 +14,7 @@ def course_details(request, course_id):
 @login_required
 def enroll(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    Enrollment.objects.get_or_create(user=request.user, course=course)
+    Learner.objects.get_or_create(user=request.user, course=course)
     return redirect("onlinecourse:course_details", course_id=course.id)
 
 
@@ -24,11 +24,11 @@ def submit(request, course_id):
     if request.method != "POST":
         return HttpResponseBadRequest("Exam submissions must be POSTed.")
 
-    enrollment, _ = Enrollment.objects.get_or_create(user=request.user, course=course)
+    enrollment, _ = Learner.objects.get_or_create(user=request.user, course=course)
 
     # Each question's radio/checkbox inputs are named "question_<id>" and hold choice ids.
     selected_ids = []
-    for question in Question.objects.filter(lesson__course=course):
+    for question in Question.objects.filter(course=course):
         selected_ids.extend(int(cid) for cid in request.POST.getlist(f"question_{question.id}"))
 
     submission = Submission.objects.create(enrollment=enrollment)
@@ -51,7 +51,7 @@ def show_exam_result(request, course_id, submission_id):
     possible_score = 0
     results = []
 
-    for question in Question.objects.filter(lesson__course=course).prefetch_related("choice_set"):
+    for question in Question.objects.filter(course=course).prefetch_related("choice_set"):
         # Only this question's choices count toward its score.
         selected = [c for c in question.choice_set.all() if c.id in selected_ids]
         is_correct = question.is_get_score([c.id for c in selected])

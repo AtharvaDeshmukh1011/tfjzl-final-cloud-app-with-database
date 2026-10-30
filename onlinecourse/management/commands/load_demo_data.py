@@ -44,6 +44,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Loaded demo course with id {course.id}."))
 
     def _question(self, lesson, text, grade, choices):
-        question = Question.objects.create(lesson=lesson, question_text=text, grade=grade)
+        question = Question.objects.create(course=lesson.course, lesson=lesson, question_text=text, grade=grade)
         for text, is_correct in choices:
             Choice.objects.create(question=question, choice_text=text, is_correct=is_correct)

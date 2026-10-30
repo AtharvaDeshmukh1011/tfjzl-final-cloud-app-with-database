@@ -27,7 +27,7 @@
   </div>
 
   <h2 class="h4 mb-3">Lessons</h2>
-  {% for lesson in course.lessons.all %}
+  {% for lesson in course.lesson_set.all %}
     <div class="card mb-3">
       <div class="card-body">
         <h3 class="h5 card-title">{{ forloop.counter }}. {{ lesson.title }}</h3>
@@ -43,7 +43,7 @@
   {% if user.is_authenticated %}
     <form action="{% url 'onlinecourse:submit' course.id %}" method="post">
       {% csrf_token %}
-      {% for lesson in course.lessons.all %}
+      {% for lesson in course.lesson_set.all %}
         {% for question in lesson.questions.all %}
           <div class="card mb-3">
             <div class="card-body">

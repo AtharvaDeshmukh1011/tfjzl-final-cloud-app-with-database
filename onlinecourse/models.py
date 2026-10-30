@@ -32,9 +32,9 @@ class Lesson(models.Model):
         return self.title
 
 
-class Enrollment(models.Model):
+class Learner(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="learners")
     date_enrolled = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -45,6 +45,7 @@ class Enrollment(models.Model):
 
 
 class Question(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="questions")
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="questions")
     question_text = models.CharField(max_length=500)
     grade = models.PositiveIntegerField(default=1)
@@ -68,7 +69,7 @@ class Choice(models.Model):
 
 
 class Submission(models.Model):
-    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name="submissions")
+    enrollment = models.ForeignKey(Learner, on_delete=models.CASCADE, related_name="submissions")
     choices = models.ManyToManyField(Choice)
     submitted_at = models.DateTimeField(auto_now_add=True)
 
